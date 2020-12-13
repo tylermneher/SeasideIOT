@@ -16,7 +16,7 @@ limitations under the License.
 
 // Authentication Constants:
 const OAUTH_SCOPE = "https://www.googleapis.com/auth/sdm.service";
-const SERVER_URI = "https://[GCP-Project-Id].web.app";
+const SERVER_URI = "https://seasideiot.web.app";
 const REDIRECT_URI = SERVER_URI + "/auth";
 
 // Partner Credentials:
@@ -41,7 +41,7 @@ var deviceId = "";
 /** init - Initializes the loaded javascript */
 function init() {
   readStorage();          // Reads data from browser's local storage if available
-  handleAuth();           // Checks incoming authorization code from /auth path 
+  handleAuth();           // Checks incoming authorization code from /auth path
   exchangeCode();         // Exchanges authorization code to an access token
 }
 
@@ -56,7 +56,7 @@ function readStorage() {
   if (localStorage["projectId"]) {
     updateProjectId(localStorage["projectId"]);
   }
-  
+
   if (localStorage["oauthCode"]) {
     updateOAuthCode(localStorage["oauthCode"]);
   }
@@ -66,7 +66,7 @@ function readStorage() {
   if (localStorage["refreshToken"]) {
     updateRefreshToken(localStorage["refreshToken"]);
   }
-  
+
   if (localStorage["isSignedIn"] === true || localStorage["isSignedIn"] === "true") {
     updateSignedIn(localStorage["isSignedIn"]);
   }
@@ -74,27 +74,27 @@ function readStorage() {
 
 /** handleAuth - Detects and sends oauth response code to server */
 function handleAuth () {
-  
+
   // Check if the url is beginning with /auth.
   if (window.location.pathname.startsWith("/auth")) {
     console.log("/auth detected!");
-    
+
     // Retreive query parameters from url.
-    var queryparams = window.location.search.split("&");     
-    
+    var queryparams = window.location.search.split("&");
+
     // Extract key-value pairs from parameters.
     for (var i = 0; i < queryparams.length; i++) {
       var key = queryparams[i].split("=")[0];
       var val = queryparams[i].split("=")[1];
-      
+
       // Send oAuth Code to server if found.
       if (key === "code") {
         updateOAuthCode(val);
       }
     }
-    
+
     // Prevent back button action by injecting a previous state.
-    window.history.pushState("object or string", "Title", "/");   
+    window.history.pushState("object or string", "Title", "/");
   }
 }
 
@@ -124,7 +124,7 @@ function exchangeCode() {
 
 /** oAuthSignIn - Handles the Sign-in button functionality */
 function oauthSignIn() {
-   
+
   // Google's OAuth 2.0 endpoint for requesting an access token:
   var oauthEndpoint = "https://nestservices.google.com/partnerconnections/" +
       projectId + "/auth";
@@ -165,13 +165,13 @@ function oauthSignOut() {
   // updateClientId("");
   // updateClientSecret("");
   // updateProjectId("");
-  
+
   updateOAuthCode("[OAuth Code...]");
   updateAccessToken("[Access Token...]");
   updateRefreshToken("[Refresh Token...]");
-  
+
   clearDevices();
-  
+
   updateSignedIn(false);
 }
 
@@ -182,7 +182,7 @@ function oauthSignOut() {
 
 function deviceAccessRequest(method, call, localpath, payload = null) {
     var xhr = new XMLHttpRequest();
-    
+
     // We are doing our post request to device access endpoint:
     xhr.open(method, "https://smartdevicemanagement.googleapis.com/v1" + localpath);
     xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
@@ -191,7 +191,7 @@ function deviceAccessRequest(method, call, localpath, payload = null) {
       // Response is passed to deviceAccessResponse function:
       deviceAccessResponse(call, xhr.response)
     };
-    
+
     if ('POST' === method && payload)
         xhr.send(JSON.stringify(payload));
     else
@@ -204,9 +204,9 @@ function deviceAccessResponse(call, response) {
     case 'listDevices':
       var data = JSON.parse(response);
       var devices = data.devices;
-      
+
       clearDevices();
-      
+
       for (let i = 0; i < devices.length; i++) {
         var str = data.devices[i].name;
         var n = str.lastIndexOf('/');
@@ -231,8 +231,8 @@ function deviceAccessResponse(call, response) {
 
 
 function addDevice(deviceName){
-  // Create an Option object       
-  var opt = document.createElement("option");        
+  // Create an Option object
+  var opt = document.createElement("option");
 
   // Assign text and value to Option object
   opt.text = deviceName;
@@ -240,7 +240,7 @@ function addDevice(deviceName){
 
   // Add an Option object to Drop Down List Box
   id("sctDeviceSelect").options.add(opt);
-  
+
   // If this is the first device added, choose it
   if(id("sctDeviceSelect").options.length == 1){
     deviceId = deviceName;
@@ -262,12 +262,12 @@ function clearDevices(){
 function signInOut() {
   if (isSignedIn) {
     oauthSignOut();
-  } else { 
+  } else {
     var gSignInMeta = document.createElement("meta");
     gSignInMeta.name = "google-signin-client_id";
     gSignInMeta.content = clientId;
     document.head.appendChild(gSignInMeta);
-    
+
     oauthSignIn();
   }
 }
@@ -355,7 +355,7 @@ function updateRefreshToken(value) {
 function updateSignedIn(value) {
   isSignedIn = value;
   localStorage["isSignedIn"] = isSignedIn;
-  
+
   if (isSignedIn) {
     id("btnSignIn").innerText = "Sign Out";
   }
